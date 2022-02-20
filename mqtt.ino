@@ -21,8 +21,8 @@ void mqtt()
 
     WiFiClient espClient;
     PubSubClient client(espClient);
-    Serial.println ("MQTTT SERVER");
-    Serial.println (config.mqttServer);
+    Serial.println("MQTTT SERVER");
+    Serial.println(config.mqttServer);
     client.setServer(config.mqttServer, config.mqttPort);
     client.setCallback(callback);
     unsigned long mqttStart = millis();
@@ -50,8 +50,8 @@ void mqtt()
         // Once connected, publish an announcement...
         char mqttMessage[70];
 
-
-        if (strcmp(config.homeAssistantIntegration , "t") == 0)
+        // if (strcmp(config.homeAssistantIntegration, "t") == 0)
+        if(false)
         { // push data to homeassisant
           Serial.print("Send data to home Assisant as json");
           char status[4];
@@ -67,8 +67,9 @@ void mqtt()
           // Get MAC address for WiFi station
           esp_read_mac(baseMac, ESP_MAC_WIFI_STA);
           char baseMacChr[9] = {0};
-          sprintf(baseMacChr, "%02X%02X%02X",  baseMac[3], baseMac[4], baseMac[5]);
-          if (strcmp(config.homeAssistantDiscovery, "t") == 0){ // HomeAssistant MQTT discovery enabled
+          sprintf(baseMacChr, "%02X%02X%02X", baseMac[3], baseMac[4], baseMac[5]);
+          if (strcmp(config.homeAssistantDiscovery, "t") == 0)
+          { // HomeAssistant MQTT discovery enabled
             //Create & Send discovery topic for each value : sensorString, lowBattString, batCharString, timerWakeString,
             Serial.println("Generate and send discovery message");
             for (int i = 0; i <= 3; i++)
@@ -81,30 +82,30 @@ void mqtt()
               char device_class[10];
               switch (i)
               {
-                case STATUT:
-                  sprintf(mqttDiscoveryTopic, "%s/binary_sensor/status%s/config", config.homeAssistantPrefix, baseMacChr);
-                  sprintf(valueTemplate, "{{value_json.status}}");
-                  sprintf(name, "Status");
-                  sprintf(device_class, "door");
-                  break;
-                case LOW_BATT:
-                  sprintf(mqttDiscoveryTopic, "%s/binary_sensor/lowbatt%s/config", config.homeAssistantPrefix, baseMacChr);
-                  sprintf(valueTemplate, "{{value_json.low_batt}}");
-                  sprintf(name, "Low Batt");
-                  sprintf(device_class, "battery");
-                  break;
-                case BATT_V:
-                  sprintf(mqttDiscoveryTopic, "%s/sensor/batt%s/config", config.homeAssistantPrefix, baseMacChr);
-                  sprintf(valueTemplate, "{{value_json.batt_v}}");
-                  sprintf(name, "Tension");
-                  sprintf(device_class, "voltage");
-                  break;
-                case TIME_WAKE:
-                  sprintf(mqttDiscoveryTopic, "%s/binary_sensor/waketime%s/config", config.homeAssistantPrefix, baseMacChr);
-                  sprintf(valueTemplate, "{{value_json.timer_wake}}");
-                  sprintf(name, "WakeTime");
-                  sprintf(device_class, "power");
-                  break;
+              case STATUT:
+                sprintf(mqttDiscoveryTopic, "%s/binary_sensor/status%s/config", config.homeAssistantPrefix, baseMacChr);
+                sprintf(valueTemplate, "{{value_json.status}}");
+                sprintf(name, "Status");
+                sprintf(device_class, "door");
+                break;
+              case LOW_BATT:
+                sprintf(mqttDiscoveryTopic, "%s/binary_sensor/lowbatt%s/config", config.homeAssistantPrefix, baseMacChr);
+                sprintf(valueTemplate, "{{value_json.low_batt}}");
+                sprintf(name, "Low Batt");
+                sprintf(device_class, "battery");
+                break;
+              case BATT_V:
+                sprintf(mqttDiscoveryTopic, "%s/sensor/batt%s/config", config.homeAssistantPrefix, baseMacChr);
+                sprintf(valueTemplate, "{{value_json.batt_v}}");
+                sprintf(name, "Tension");
+                sprintf(device_class, "voltage");
+                break;
+              case TIME_WAKE:
+                sprintf(mqttDiscoveryTopic, "%s/binary_sensor/waketime%s/config", config.homeAssistantPrefix, baseMacChr);
+                sprintf(valueTemplate, "{{value_json.timer_wake}}");
+                sprintf(name, "WakeTime");
+                sprintf(device_class, "power");
+                break;
               }
               //Short Version
               sprintf(mqttDiscoveryMessage, "{\"name\": \"%s\", \"stat_t\":\"%s\", \"val_tpl\":\"%s\", \"dev_cla\":\"%s\"}", name, stateTopic, valueTemplate, device_class);
@@ -116,9 +117,11 @@ void mqtt()
               Serial.println(client.publish_P(mqttDiscoveryTopic, mqttDiscoveryMessage, false));
               Serial.println("*******************");
             }
-          }else{ // Direct sent to mqtt without discovery message
-             sprintf(stateTopic, "");
-              sprintf(stateTopic, "%s/%s/state", config.homeAssistantPrefix, baseMacChr);
+          }
+          else
+          { // Direct sent to mqtt without discovery message
+            sprintf(stateTopic, "");
+            sprintf(stateTopic, "%s/%s/state", config.homeAssistantPrefix, baseMacChr);
           }
           //Create & Send message
           if (contactLatchClosed)
@@ -145,13 +148,20 @@ void mqtt()
           {
             sprintf(timerWakeString, "OFF");
           }
-
+          //TODO : find a way to add additionnal data in HA mqtt message (eg weight)
           Serial.println("--------------------------");
-          sprintf(mqttMessage, "{\"status\": \"%s\", \"batt_v\": \"%s\", \"low_batt\": \"%s\", \"timer_wake\": \"%s\"}",
+          sprintf(mqttMessage, "{\"status\": \"%s\", \"batt_v\": \"%s\", \"low_batt\": \"%s\", \"timer_wake\": \"%s\"",
                   status,
                   batCharString,
                   lowBattString,
                   timerWakeString);
+          if (false)
+          { // FIXME replace by condition 'additionnalData
+            char additionnalData[25];
+            sprintf(additionnalData, ", \"%s\":\"%s\"",config.homeAssAddData ,"11");
+            strcat(mqttMessage, additionnalData);
+          }
+          strcat(mqttMessage, "}"); // close json message
           Serial.println("*******************");
           Serial.println("Publish state data: ");
           Serial.println(mqttMessage);

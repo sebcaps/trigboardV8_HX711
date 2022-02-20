@@ -1,7 +1,9 @@
 #define OTA_DEBUG
 #include "includes.h"
-
-const char fwVersion[] = "11/29/21";
+// FIXME set the correct date...
+const char fwVersion[] = "11/29/21_HX711";
+char weightString[5];
+boolean getweight();
 
 void setup() {
 
@@ -17,6 +19,10 @@ void setup() {
   
   Serial.println(getBattery(), 2);
   if (pushLogic()) { //decide if push will occur or nt and what message will be
+    if (getweight()){
+      strcat(pushMessage,",");
+      strcat(pushMessage,weightString);
+    }
     timestampAppend();
     if (wiFiNeeded) {
       if (connectWiFi()) {

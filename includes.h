@@ -34,6 +34,7 @@
 
 #include <ESPmDNS.h>
 #include <ArduinoOTA.h>
+#include <HX711.h>
 
 //trigBoard PINS
 const int BatteryPin = 36;//analog Input
@@ -44,8 +45,13 @@ const int contactOpenedPin = 18;//input
 const int contactClosedPin = 19;//input
 const int contactStatusPin = 23;//input
 const int wakeButtonPin = 27;//input
-const int SDApin = 21;//rtc I2C
-const int SCLpin = 22;//rtc I2C
+// const int SDApin = 21;//rtc I2C
+// const int SCLpin = 22;//rtc I2C
+const int cellDoutPin=34
+const int cellSckPin= 35
+
+const long cellOffset= 0;
+const long cellDivider= 1;
 
 //globals
 struct Config {//full configuration file
@@ -106,6 +112,7 @@ enum homeAssistantValues{
   LOW_BATT,
   BATT_V,
   TIME_WAKE
+};
   char clkEnable[3];
   int clkTimeZone;
   char clkAppendEnable[3];
@@ -125,7 +132,7 @@ enum homeAssistantValues{
   char failedConnect[3];
   int secondsAfterToCheckAgain;
   
-};
+
 //bluetooth
 BLEServer *pServer = NULL;
 BLECharacteristic * pTxCharacteristic;
