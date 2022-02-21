@@ -2,13 +2,13 @@
 #define INCLUDES_H
 
 /*
- * Versions:
- * Arduino IDE v1.8.15
- * ESP32 v1.06
- * PubSubClient Library v2.8.0
- * Arduino Json Library v6.18.0
- * UniversalTelegramBot v1.3.0
- */
+   Versions:
+   Arduino IDE v1.8.15
+   ESP32 v1.06
+   PubSubClient Library v2.8.0
+   Arduino Json Library v6.18.0
+   UniversalTelegramBot v1.3.0
+*/
 
 
 
@@ -25,6 +25,7 @@
 #include <PubSubClient.h>//for mqtt
 #include <ArduinoJson.h>
 #include <UniversalTelegramBot.h>
+#include <HX711.h>
 //********************************************************
 
 #include <BLEDevice.h>
@@ -34,7 +35,7 @@
 
 #include <ESPmDNS.h>
 #include <ArduinoOTA.h>
-#include <HX711.h>
+
 
 //trigBoard PINS
 const int BatteryPin = 36;//analog Input
@@ -45,13 +46,13 @@ const int contactOpenedPin = 18;//input
 const int contactClosedPin = 19;//input
 const int contactStatusPin = 23;//input
 const int wakeButtonPin = 27;//input
-// const int SDApin = 21;//rtc I2C
-// const int SCLpin = 22;//rtc I2C
-const int cellDoutPin=34
-const int cellSckPin= 35
+const int SDApin = 21;//rtc I2C
+const int SCLpin = 22;//rtc I2C
+const int cellDoutPin = 34;
+const int cellSckPin = 33;
 
-const long cellOffset= 0;
-const long cellDivider= 1;
+const long cellOffset = 0;
+const float cellDivider = 2280.f;
 
 //globals
 struct Config {//full configuration file
@@ -106,13 +107,6 @@ struct Config {//full configuration file
   char highSpeed[3];
   char homeAssistantIntegration[3];
   char homeAssistantPrefix[50];
-};
-enum homeAssistantValues{
-  STATUT,
-  LOW_BATT,
-  BATT_V,
-  TIME_WAKE
-};
   char clkEnable[3];
   int clkTimeZone;
   char clkAppendEnable[3];
@@ -131,7 +125,7 @@ enum homeAssistantValues{
   char lastState[3];
   char failedConnect[3];
   int secondsAfterToCheckAgain;
-  
+};
 
 //bluetooth
 BLEServer *pServer = NULL;

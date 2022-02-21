@@ -20,6 +20,7 @@ void setup() {
   Serial.println(getBattery(), 2);
   if (pushLogic()) { //decide if push will occur or nt and what message will be
     if (getweight()){
+      Serial.println("*******Scale available");
       strcat(pushMessage,",");
       strcat(pushMessage,weightString);
     }
